@@ -172,7 +172,7 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
       );
 
       final CachedObject cachedObject =
-          await _getCachedObject(firebaseUrl, options);
+          await _getCachedObject(firebaseUrl, options, maxSize: maxSize);
 
       final bytes = cachedObject.rawData;
 
@@ -208,8 +208,9 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
 
   Future<CachedObject> _getCachedObject(
     FirebaseUrl url,
-    CacheOptions options,
-  ) async {
+    CacheOptions options, {
+    int? maxSize,
+  }) async {
     try {
       final cachedObject = await FirebaseCacheManager(
         subDir: _subDir,
@@ -217,6 +218,7 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
       ).getSingleObject(
         url,
         options: options,
+        maxSize: maxSize ?? 10485760,
       );
 
       return cachedObject;
@@ -226,7 +228,7 @@ class FirebaseImageProvider extends ImageProvider<FirebaseImageProvider> {
       }
 
       if (fallbackUrl != null && _isObjectNotFoundError(e)) {
-        return _getCachedObject(fallbackUrl!, fallbackOptions);
+        return _getCachedObject(fallbackUrl!, fallbackOptions, maxSize: maxSize);
       }
 
       rethrow;
